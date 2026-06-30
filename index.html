@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +17,20 @@
             --card-bg: rgba(30, 41, 59, 0.7);
         }
 
+        :root[data-theme="light"] {
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --card-bg: rgba(255, 255, 255, 0.8);
+        }
+
+        :root[data-theme="light"] body {
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 100%, 95%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 100%, 90%, 0.5) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 100%, 90%, 0.5) 0, transparent 50%);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -30,11 +45,42 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.2) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.2) 0, transparent 50%);
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 0.2) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 0.2) 0, transparent 50%);
             background-attachment: fixed;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-switch-wrapper {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .theme-toggle {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            font-size: 1.5rem;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        :root[data-theme="light"] .theme-toggle {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
         }
 
         header {
@@ -89,7 +135,8 @@
             background: rgba(15, 23, 42, 0.5);
         }
 
-        .upload-area:hover, .upload-area.dragover {
+        .upload-area:hover,
+        .upload-area.dragover {
             border-color: var(--primary);
             background: rgba(99, 102, 241, 0.05);
         }
@@ -148,7 +195,7 @@
             color: #10b981;
             margin-top: 1rem;
         }
-        
+
         .confidence {
             color: var(--text-muted);
             font-size: 0.9rem;
@@ -157,31 +204,58 @@
 
         /* Animations */
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
     </style>
 </head>
+
 <body>
 
+    <div class="theme-switch-wrapper">
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Theme">
+            🌞
+        </button>
+    </div>
+
     <header>
-        <h1>Hand Gesture AI</h1>
-        <p class="subtitle">SkillCraft Technology Internship | Task 04</p>
+        <h1>Hand Gesture Predictor</h1>
+
     </header>
 
     <main>
         <div class="project-details">
-            <p>Welcome to the Hand Gesture Recognition portal. Upload an image of a hand gesture (like a palm, fist, or peace sign), and our Convolutional Neural Network will classify it instantly.</p>
+            <p>Welcome to the Hand Gesture Recognition portal. Upload an image of a hand gesture (like a palm, fist, or
+                peace sign), and our Convolutional Neural Network will classify it instantly.</p>
         </div>
 
         <div class="upload-area" id="drop-zone" onclick="document.getElementById('file-input').click()">
@@ -202,6 +276,30 @@
     </main>
 
     <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        
+        // Check for saved user preference
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme) {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            if (currentTheme === 'light') {
+                themeToggleBtn.textContent = '🌙';
+            }
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            let theme = document.documentElement.getAttribute('data-theme');
+            if (theme === 'light') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'dark');
+                themeToggleBtn.textContent = '🌞';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                themeToggleBtn.textContent = '🌙';
+            }
+        });
+
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const predictBtn = document.getElementById('predict-btn');
@@ -234,7 +332,7 @@
             handleFiles(files);
         });
 
-        fileInput.addEventListener('change', function() {
+        fileInput.addEventListener('change', function () {
             handleFiles(this.files);
         });
 
@@ -256,32 +354,52 @@
             }
         }
 
-        // Mock Prediction
-        predictBtn.addEventListener('click', () => {
-            // Simulate processing time
+        predictBtn.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
             predictBtn.textContent = 'Analyzing...';
             predictBtn.style.opacity = '0.7';
             predictBtn.style.pointerEvents = 'none';
-            
-            setTimeout(() => {
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
                 predictBtn.style.display = 'none';
                 results.style.display = 'block';
                 
-                // Random mock result for UI demo purposes
-                const gestures = ['Palm ✋', 'Fist ✊', 'Peace ✌️', 'Thumbs Up 👍'];
-                const randomGesture = gestures[Math.floor(Math.random() * gestures.length)];
-                const randomConfidence = (Math.random() * (99.9 - 85.0) + 85.0).toFixed(2);
-                
-                predictionText.textContent = randomGesture;
-                confidenceText.textContent = `Confidence: ${randomConfidence}%`;
-                
-                // Reset button
+                if (response.ok) {
+                    predictionText.textContent = data.gesture;
+                    confidenceText.textContent = `Confidence: ${(data.confidence * 100).toFixed(2)}%`;
+                } else {
+                    predictionText.textContent = "Error";
+                    confidenceText.textContent = data.error || "Failed to analyze image";
+                    predictionText.style.color = "#ef4444"; // red for error
+                }
+            } catch (err) {
+                predictBtn.style.display = 'none';
+                results.style.display = 'block';
+                predictionText.textContent = "Error";
+                confidenceText.textContent = "Could not connect to backend server.";
+                predictionText.style.color = "#ef4444";
+            } finally {
                 predictBtn.textContent = 'Analyze Gesture';
                 predictBtn.style.opacity = '1';
                 predictBtn.style.pointerEvents = 'auto';
                 
-                // Add a reset option
+                const existingResetBtn = document.getElementById('reset-btn-dynamic');
+                if (existingResetBtn) existingResetBtn.remove();
+
                 const resetBtn = document.createElement('button');
+                resetBtn.id = 'reset-btn-dynamic';
                 resetBtn.className = 'btn';
                 resetBtn.style.marginTop = '1rem';
                 resetBtn.style.background = 'transparent';
@@ -293,12 +411,13 @@
                     dropZone.style.display = 'block';
                     predictBtn.style.display = 'none';
                     fileInput.value = '';
+                    predictionText.style.color = "#10b981"; // reset to green
                     resetBtn.remove();
                 };
                 results.appendChild(resetBtn);
-                
-            }, 1500);
+            }
         });
     </script>
 </body>
+
 </html>
