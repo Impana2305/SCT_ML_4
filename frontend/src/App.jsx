@@ -60,10 +60,9 @@ function App() {
     const formData = new FormData();
     formData.append('image', file);
 
-    // Dynamic API URL for Vercel deployment
     const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
       ? 'http://localhost:5000/predict' 
-      : '/api/predict'; // Adjust based on your Vercel functions setup
+      : '/api/predict';
 
     try {
       const response = await fetch(apiUrl, {
@@ -99,82 +98,118 @@ function App() {
   };
 
   return (
-    <>
-      <div className="bg-mesh"></div>
-      <div className="container">
-        <div className="header">
-          <h1>NeuroHand</h1>
-          <p>Advanced CNN Gesture Recognition</p>
+    <div className="app-container">
+      <header className="app-header">
+        <h1><i className="fa-solid fa-hand-sparkles"></i> Hand Gesture Recognition</h1>
+        <p>Upload a photo to identify the hand gesture and see how the model reached its decision.</p>
+      </header>
+
+      <div className="main-content">
+        {/* Left Column */}
+        <div className="left-column">
+          <div className="input-card">
+            <div className="card-header">
+              <span>IMAGE INPUT</span>
+            </div>
+            
+            <div className="card-body">
+              {!file ? (
+                <div 
+                  className={`drop-zone ${isDragging ? 'dragover' : ''}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <i className="fa-solid fa-arrow-up-from-bracket upload-icon"></i>
+                  <p className="drop-title">Drop image here</p>
+                  <p className="drop-subtitle">or click to browse &middot; JPG PNG WebP</p>
+                  <input 
+                    type="file" 
+                    className="file-input" 
+                    accept="image/*" 
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
+                </div>
+              ) : (
+                <div className="preview-area">
+                  <img src={preview} alt="Preview" className="preview-img" />
+                  <div className="action-buttons">
+                    <button className="btn-primary" onClick={handlePredict} disabled={isLoading}>
+                      {isLoading ? 'Analyzing...' : 'Analyze Gesture'}
+                    </button>
+                    <button className="btn-secondary" onClick={handleReset} disabled={isLoading}>
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="metrics-card">
+            <div className="metric-row">
+              <span className="metric-label">Training Images</span>
+              <span className="metric-value">20,000</span>
+            </div>
+            <div className="metric-row">
+              <span className="metric-label">CNN Architecture</span>
+              <span className="metric-value">4-Layer</span>
+            </div>
+            <div className="metric-row border-none">
+              <span className="metric-label">Server Latency</span>
+              <span className="metric-value">0ms</span>
+            </div>
+          </div>
         </div>
 
-        <div className="glass-card">
-          {!file && (
-            <div 
-              className={`upload-area ${isDragging ? 'dragover' : ''}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current.click()}
-            >
-              <i className="fa-solid fa-cloud-arrow-up upload-icon"></i>
-              <h3>Upload an Image</h3>
-              <p>Drag & drop or click to browse</p>
-              <input 
-                type="file" 
-                className="file-input" 
-                accept="image/*" 
-                ref={fileInputRef}
-                onChange={handleFileChange}
-              />
-            </div>
-          )}
+        {/* Right Column */}
+        <div className="right-column">
+          <div className="tabs">
+            <div className="tab active">Classification</div>
+            <div className="tab">Model Metrics</div>
+          </div>
 
-          {file && !result && !error && !isLoading && (
-            <div className="preview-container">
-              <img className="preview-image" src={preview} alt="Selected" />
-              <button className="btn" onClick={handlePredict}>
-                <i className="fa-solid fa-wand-magic-sparkles"></i> Analyze Gesture
-              </button>
-            </div>
-          )}
-
-          {isLoading && (
-            <div className="loader"></div>
-          )}
-
-          {(result || error) && (
-            <div className="results-section" style={{ display: 'block' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                Detected Gesture
-              </p>
-              
-              <div className={`prediction-result ${error ? 'error' : ''}`}>
-                {error ? 'Error' : result.gesture}
+          <div className="result-panel">
+            {!result && !error && !isLoading && (
+              <div className="empty-state">
+                <i className="fa-solid fa-paw empty-icon"></i>
+                <p>Upload an image and analyze it to see the classification result here.</p>
               </div>
-              
-              <div className="confidence-wrapper">
-                <div 
-                  className={`confidence-bar ${error ? 'error' : ''}`} 
-                  style={{ width: error ? '100%' : `${result.confidence}%` }}
-                ></div>
-              </div>
-              
-              <div className="confidence-text">
-                {error ? '' : `Confidence: ${result.confidence}%`}
-              </div>
-              
-              {error && (
-                <div className="error-text">{error}</div>
-              )}
+            )}
 
-              <button className="reset-btn" onClick={handleReset}>
-                <i className="fa-solid fa-rotate-right"></i> Try Another
-              </button>
-            </div>
-          )}
+            {isLoading && (
+              <div className="loading-state">
+                <div className="spinner"></div>
+                <p>Analyzing image structure...</p>
+              </div>
+            )}
+
+            {(result || error) && (
+              <div className="classification-result">
+                {error ? (
+                  <div className="error-box">
+                    <i className="fa-solid fa-triangle-exclamation"></i>
+                    <p>{error}</p>
+                  </div>
+                ) : (
+                  <div className="success-box">
+                    <h2>{result.gesture}</h2>
+                    <div className="confidence-meter">
+                      <div className="meter-bg">
+                        <div className="meter-fill" style={{width: `${result.confidence}%`}}></div>
+                      </div>
+                      <p>Confidence: {result.confidence}%</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

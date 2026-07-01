@@ -63,6 +63,9 @@ def predict():
             # Find the largest contour (assuming it's the hand)
             c = max(contours, key=cv2.contourArea)
             if cv2.contourArea(c) > 500: # Threshold for minimum hand size
+                # Apply mask to the original image to black out background
+                img = cv2.bitwise_and(img, img, mask=mask)
+                
                 x, y, w_c, h_c = cv2.boundingRect(c)
                 
                 # Add padding
@@ -88,9 +91,12 @@ def predict():
                 if crop_y_max > crop_y_min and crop_x_max > crop_x_min:
                     img = img[crop_y_min:crop_y_max, crop_x_min:crop_x_max]
 
+        # Convert to grayscale to simulate near-IR images in dataset, then back to 3-channel
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
+
         # Preprocess
         img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = img.astype('float32') / 255.0
         img = np.expand_dims(img, axis=0) # Add batch dimension
         

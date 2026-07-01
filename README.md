@@ -1,54 +1,50 @@
-# ✋ Task 04: Hand Gesture Recognition using CNN
+# Hand Gesture Recognition CNN 🖐️
 
-## 📌 Overview
+**Task 04** of the SkillCraft Technology Machine Learning Internship.
 
-This project is part of my **Machine Learning Internship at SkillCraft Technology (Task 04)**. The objective is to build a **Convolutional Neural Network (CNN)** that can recognize and classify different hand gestures from image data.
-
----
-
-## 🚀 Project Workflow
-
-* Load and explore the image dataset
-* Preprocess images (resize, normalize, and encode labels)
-* Split the dataset into training and testing sets
-* Build and train a CNN model
-* Evaluate model performance
-* Predict hand gestures for new images
-
----
-
-## 🧠 Technologies Used
-
-* Python
-* TensorFlow / Keras
-* NumPy
-* OpenCV
-* Matplotlib
-* Scikit-learn
-
----
-
-## 📊 Results
-
-The CNN model successfully classifies hand gesture images by learning visual patterns from the dataset. The project demonstrates the effectiveness of deep learning for image recognition tasks.
-
----
-
-## 🎯 Key Learnings
-
-* Image preprocessing for deep learning
-* Building and training CNN models
-* Evaluating image classification performance
-* Predicting classes for new images
-
----
+This project implements a Convolutional Neural Network (CNN) to recognize and classify hand gestures from images. It features a complete pipeline from data preprocessing to model training, and includes a modern, beautifully designed React frontend to easily test the model.
 
 ## 📁 Dataset
+This project uses the **leapGestRecog** dataset, which contains near-infrared images of hand gestures.
+- The dataset is structured into 10 distinct classes: `01_palm`, `02_l`, `03_fist`, `04_fist_moved`, `05_thumb` (thumbs up), `06_index`, `07_ok`, `08_palm_moved`, `09_c`, `10_down`.
+- Images are preprocessed by resizing to 64x64, converting to grayscale (then to 3-channel to match model requirements), and normalizing pixel values.
 
-Hand Gesture Image Dataset
+## 🧠 Model Architecture
+The model is a robust CNN built with TensorFlow/Keras, consisting of:
+- **3 Convolutional Layers** (with ReLU activation and MaxPooling) to extract spatial features from the hand gestures.
+- **Flatten Layer** to convert 2D feature maps to 1D.
+- **Dense Layers** with Dropout (0.5) to prevent overfitting.
+- **Softmax Output Layer** to classify into the 10 gesture categories.
 
----
+## 🛠️ Tech Stack
+- **Machine Learning**: Python, TensorFlow, Keras, OpenCV, Scikit-learn
+- **Backend API**: Flask
+- **Frontend**: React, Vite, standard CSS (fully responsive, modern UI)
 
-## 👩‍💻 Author
+## 🚀 How to Run Locally
 
-Machine Learning Intern – SkillCraft Technology
+### 1. Start the Backend API
+The Python backend processes the image using skin-color thresholding and runs inference through the trained CNN model.
+```bash
+# Install dependencies
+pip install tensorflow opencv-python flask flask-cors numpy scikit-learn
+
+# Run the backend (runs on http://localhost:5000)
+python app.py
+```
+
+### 2. Start the Frontend UI
+The modern React application provides an intuitive drag-and-drop interface for testing the model.
+```bash
+cd frontend
+
+# Install frontend dependencies
+npm install
+
+# Start the Vite development server
+npm run dev
+```
+Open the provided localhost URL in your browser to test the gesture recognition.
+
+## 📊 Results
+The model achieves high accuracy on the test set. When testing with real-world images (like from a webcam or Google), the backend automatically uses skin-color thresholding to isolate the hand and black out the background, ensuring high prediction accuracy that perfectly matches the training distribution.
