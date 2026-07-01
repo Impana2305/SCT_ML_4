@@ -47,6 +47,47 @@ def predict():
         if img is None:
             return jsonify({"error": "Invalid image."}), 400
             
+        # Try to detect and crop hand using skin color thresholding
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        
+        # Define skin color range in HSV
+        lower_skin = np.array([0, 20, 70], dtype=np.uint8)
+        upper_skin = np.array([20, 255, 255], dtype=np.uint8)
+        
+        mask = cv2.inRange(hsv, lower_skin, upper_skin)
+        
+        # Find contours of the skin mask
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        if contours:
+            # Find the largest contour (assuming it's the hand)
+            c = max(contours, key=cv2.contourArea)
+            if cv2.contourArea(c) > 500: # Threshold for minimum hand size
+                x, y, w_c, h_c = cv2.boundingRect(c)
+                
+                # Add padding
+                pad_x = int(w_c * 0.2)
+                pad_y = int(h_c * 0.2)
+                
+                h, w, _ = img.shape
+                x_min = max(0, x - pad_x)
+                y_min = max(0, y - pad_y)
+                x_max = min(w, x + w_c + pad_x)
+                y_max = min(h, y + h_c + pad_y)
+                
+                # Make square crop
+                cx = (x_min + x_max) // 2
+                cy = (y_min + y_max) // 2
+                side = max(x_max - x_min, y_max - y_min) // 2
+                
+                crop_x_min = max(0, cx - side)
+                crop_y_min = max(0, cy - side)
+                crop_x_max = min(w, cx + side)
+                crop_y_max = min(h, cy + side)
+                
+                if crop_y_max > crop_y_min and crop_x_max > crop_x_min:
+                    img = img[crop_y_min:crop_y_max, crop_x_min:crop_x_max]
+
         # Preprocess
         img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
