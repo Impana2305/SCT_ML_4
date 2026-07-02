@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './index.css';
 
 function App() {
@@ -9,6 +9,16 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -100,6 +110,9 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header">
+        <button onClick={toggleTheme} className="theme-btn" title="Toggle Theme">
+          {theme === 'light' ? <i className="fa-solid fa-moon"></i> : <i className="fa-solid fa-sun"></i>}
+        </button>
         <h1><i className="fa-solid fa-hand-sparkles"></i> Hand Gesture Recognition</h1>
         <p>Upload a photo to identify the hand gesture and see how the model reached its decision.</p>
       </header>
@@ -153,13 +166,9 @@ function App() {
               <span className="metric-label">Training Images</span>
               <span className="metric-value">20,000</span>
             </div>
-            <div className="metric-row">
+            <div className="metric-row border-none">
               <span className="metric-label">CNN Architecture</span>
               <span className="metric-value">4-Layer</span>
-            </div>
-            <div className="metric-row border-none">
-              <span className="metric-label">Server Latency</span>
-              <span className="metric-value">0ms</span>
             </div>
           </div>
         </div>
@@ -168,7 +177,6 @@ function App() {
         <div className="right-column">
           <div className="tabs">
             <div className="tab active">Classification</div>
-            <div className="tab">Model Metrics</div>
           </div>
 
           <div className="result-panel">
